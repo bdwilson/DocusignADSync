@@ -32,7 +32,9 @@ give Docusign some password they will never remember or risk losing if
 Docusign's credentials were to be "lost".  
 
 The secondary benefit of this script is that users can be auto-provisioned to a
-particular group based on the AD group that they exist in.  To get started, you need to create a dev account at https://www.docusign.com/developer-center/get-started use AccountInfo.pl to dump your accountid and list of groups. I would create a Signers group and an Initiators group in Docusign (you know, folks who can only sign stuff that is sent to them vs. folks who can start a workflow requesting a signature). You then need to use accountInfo.pl to dump the list of groups from your account to get the name->ID mappings and transfer them to the script. Next, create similar groups in Active Directory which you would populate with these signers and initiators. This is where you update the mappings in the script itself. 
+particular group based on the AD group that they exist in.  To get started, you
+need to create a dev account at
+https://www.docusign.com/developer-center/get-started then use AccountInfo.pl to dump your accountid and list of groups. I would create a Signers group and an Initiators group in Docusign (you know, folks who can only sign stuff that is sent to them vs. folks who can start a workflow requesting a signature). You then need to use accountInfo.pl to dump the list of groups from your account to get the name->ID mappings and transfer them to the script. Next, create similar groups in Active Directory which you would populate with these signers and initiators. This is where you update the mappings in the script itself. 
 
 Bugs/Contact Info
 -----------------
