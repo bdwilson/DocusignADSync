@@ -9,13 +9,14 @@ use JSON;
 
 # You need to create a dev account at
 # https://www.docusign.com/developer-center/get-started
-$accountid="XXXXXX";
 $apiuser="user\@email.com";
 $apipass="pass";
 $apikey="XXXX-XXXX-XXXXX-XXXXX-XXXXX-XXXXX";
 
 my $client = REST::Client->new();
 my $headers={ 'Accept' => 'application/json', 'Content-Type' => 'application/json', 'X-DocuSign-Authentication' => "<DocuSignCredentials><Username>$apiuser</Username><Password>$apipass</Password><IntegratorKey>$apikey</IntegratorKey></DocuSignCredentials>" };
+$endpoint="/restapi/v2/";
+$server="https://demo.docusign.net";
 $client->setHost($server);
 
 &getAccountInfo;
