@@ -25,6 +25,9 @@ $apiuser="user\@email.com";
 $apipass="pass";
 $apikey="XXXX-XXXX-XXXXX-XXXXX-XXXXX-XXXXX";
 
+# Print trace data for Docusign API certification
+# $debug=1;
+
 # This will need to be changed once you get your script/apikey moved to
 # production
 $server="https://demo.docusign.net";
@@ -131,6 +134,16 @@ sub groupChange {
 	} else {
 		$client->PUT($endpoint."accounts/$accountid/groups/$groupId/users",$data,$headers);
 	}
+        if ($debug) {
+                print "=" x 60 . "\n";
+                print "Request:\n";
+                print Dumper $client->{'_res'}->{'_request'};
+                print "Response:\n";
+                print Dumper $client->{'_res'}->{'_content'};
+                print "Response Headers:\n";
+                print Dumper $client->{'_res'}->{'_headers'};
+                print "=" x 60 . "\n";
+        }
 	my $decoded_json = decode_json($client->responseContent());
 	foreach(@{$decoded_json->{"users"}}) {
 		if ($_->{'errorDetails'}) {
@@ -138,7 +151,9 @@ sub groupChange {
 			last;
 		}
 		if ($_->{'userStatus'} eq "created") {
-			print "$type user $email to/from group ($groupId) successful.\n";
+			if (!$debug) {
+				print "$type user $email to/from group ($groupId) successful.\n";
+			}
 		}
 	}
 }
@@ -149,6 +164,9 @@ sub createUser {
 	my($email,$userName)=@_;
 	my @chars = (a..z, A..Z, 0..9);
 	my $password = join '', map { @chars[rand @chars] } 1 .. 20;
+	if ($debug) {
+		$password = "DebugMode";
+	}
 	my %json_data =  ( 
 		 newUsers =>[{ 
 			email => "$email",
@@ -171,6 +189,16 @@ sub createUser {
 	
 	my $data = encode_json(\%json_data);
 	$client->POST($endpoint."accounts/$accountid/users",$data,$headers);
+        if ($debug) {
+                print "=" x 60 . "\n";
+                print "Request:\n";
+                print Dumper $client->{'_res'}->{'_request'};
+                print "Response:\n";
+                print Dumper $client->{'_res'}->{'_content'};
+                print "Response Headers:\n";
+                print Dumper $client->{'_res'}->{'_headers'};
+                print "=" x 60 . "\n";
+        }
 	my $decoded_json = decode_json($client->responseContent());
 	foreach(@{$decoded_json->{"newUsers"}}) {
 		if ($_->{'errorDetails'}) {
@@ -178,7 +206,9 @@ sub createUser {
 			last;
 		}
 		if ($userId= $_->{'userId'}) {
-			print "UserID created: $_->{'email'} ($_->{'userId'})\n";
+			if (!$debug) {
+				print "UserID created: $_->{'email'} ($_->{'userId'})\n";
+			}
 			return $_;
 		}
 	}
@@ -187,8 +217,17 @@ sub createUser {
 # get extended user data from Docusign. store in hash with userName as key (not email :()
 sub getUsers {
 	$client->GET($endpoint."/accounts/$accountid/users?additional_info=true",$headers);
+        if ($debug) {
+                print "=" x 60 . "\n";
+                print "Request:\n";
+                print Dumper $client->{'_res'}->{'_request'};
+                print "Response:\n";
+                print Dumper $client->{'_res'}->{'_content'};
+                print "Response Headers:\n";
+                print Dumper $client->{'_res'}->{'_headers'};
+                print "=" x 60 . "\n";
+        }
 	my $decoded_json = decode_json($client->responseContent());
-
 	foreach(@{$decoded_json->{"users"}}) {
 			$docusignUsers{$_->{'userName'}}=$_;
 	}
@@ -198,22 +237,45 @@ sub getUsers {
 # Dump accountid and group info.
 sub getAccountInfo {
 	$client->GET($endpoint."login_information",$headers);
+        if ($debug) {
+                print "=" x 60 . "\n";
+                print "Request:\n";
+                print Dumper $client->{'_res'}->{'_request'};
+                print "Response:\n";
+                print Dumper $client->{'_res'}->{'_content'};
+                print "Response Headers:\n";
+                print Dumper $client->{'_res'}->{'_headers'};
+                print "=" x 60 . "\n";
+        }
 	my $decoded_json = decode_json($client->responseContent());
-
 	foreach(@{$decoded_json->{"loginAccounts"}}) {
 		if ($accountId = $_->{'accountId'}) {
-			print "AccountID: $accountId\n\n";
+			if (!$debug) {
+				print "AccountID: $accountId\n\n";
+			}
 		}
 	}
 
 	$client->GET($endpoint."accounts/$accountId/groups",$headers);
+        if ($debug) {
+                print "=" x 60 . "\n";
+                print "Request:\n";
+                print Dumper $client->{'_res'}->{'_request'};
+                print "Response:\n";
+                print Dumper $client->{'_res'}->{'_content'};
+                print "Response Headers:\n";
+                print Dumper $client->{'_res'}->{'_headers'};
+                print "=" x 60 . "\n";
+        }
 	$decoded_json = decode_json($client->responseContent());
 	foreach(@{$decoded_json->{"groups"}}) {
-		if ($groupName= $_->{'groupName'}) {
-			print "GroupName: $groupName\n";
-		}
-		if ($groupId= $_->{'groupId'}) {
-			print "GroupID: $groupId\n\n";
+		if (!$debug) {
+			if ($groupName= $_->{'groupName'}) {
+				print "GroupName: $groupName\n";
+			}
+			if ($groupId= $_->{'groupId'}) {
+				print "GroupID: $groupId\n\n";
+			}
 		}
 	}
 }
